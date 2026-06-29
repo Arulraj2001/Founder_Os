@@ -47,8 +47,8 @@ export async function getItems<T>(key: string, defaultValue: T[]): Promise<T[]> 
         }
       }
       return defaultValue;
-    } catch (e) {
-      console.error(`[DB] Error fetching "${key}" from Firestore:`, e);
+    } catch (e: any) {
+      console.warn(`[DB] Firestore fetch for "${key}" timed out or failed (${e.message || e}). Using local storage fallback.`);
       // Fall through to the localStorage fallback below on error/timeout
     }
   }
@@ -82,8 +82,8 @@ export async function saveItems<T>(key: string, items: T[]): Promise<void> {
       const docRef = doc(db, "workspace_data", key);
       // Save with a timeout to avoid hanging the UI
       await withTimeout(setDoc(docRef, { items }), 1500);
-    } catch (e) {
-      console.error(`[DB] Error saving "${key}" to Firestore:`, e);
+    } catch (e: any) {
+      console.warn(`[DB] Firestore save for "${key}" timed out or failed (${e.message || e}). Saved locally only.`);
     }
   }
 }
@@ -112,8 +112,8 @@ export async function clearAll(): Promise<void> {
       try {
         const docRef = doc(db, "workspace_data", key);
         await withTimeout(deleteDoc(docRef), 1500);
-      } catch (e) {
-        console.error(`[DB] Error deleting document "${key}" from Firestore:`, e);
+      } catch (e: any) {
+        console.warn(`[DB] Firestore deletion for "${key}" timed out or failed (${e.message || e}).`);
       }
     }
   }
