@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { getItems, saveItems } from "@/lib/db";
 import { Calendar as CalendarIcon, Plus, Clock, Users, Video, Pencil, Trash2, X } from "lucide-react";
 
 interface Event {
@@ -22,17 +23,12 @@ export default function CalendarPage() {
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem("founder_events");
-    if (saved) {
-      try { setEvents(JSON.parse(saved)); } catch (e) {}
-    } else {
-      setEvents([]);
-    }
+    getItems<Event>("founder_events", []).then(setEvents);
   }, []);
 
   const save = (updated: Event[]) => {
     setEvents(updated);
-    localStorage.setItem("founder_events", JSON.stringify(updated));
+    saveItems("founder_events", updated);
   };
 
   const handleAddEvent = (e: React.FormEvent) => {

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { getItems, saveItems } from "@/lib/db";
 import { motion, AnimatePresence } from "motion/react";
 import { CheckSquare, Plus, Trash2, Filter, AlertTriangle, CheckCircle, Pencil, X } from "lucide-react";
 
@@ -23,17 +24,12 @@ export default function TasksPage() {
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem("founder_tasks_all");
-    if (saved) {
-      try { setTasks(JSON.parse(saved)); } catch (e) {}
-    } else {
-      setTasks([]);
-    }
+    getItems<Task>("founder_tasks_all", []).then(setTasks);
   }, []);
 
   const save = (updated: Task[]) => {
     setTasks(updated);
-    localStorage.setItem("founder_tasks_all", JSON.stringify(updated));
+    saveItems("founder_tasks_all", updated);
   };
 
   const handleAddTask = (e: React.FormEvent) => {

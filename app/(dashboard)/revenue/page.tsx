@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { getItems, saveItems } from "@/lib/db";
 import { DollarSign, Plus, Download, Receipt, ArrowUpRight, Pencil, Trash2, X } from "lucide-react";
 
 interface Transaction {
@@ -21,17 +22,12 @@ export default function RevenuePage() {
   const [editingTransactionId, setEditingTransactionId] = useState<string | null>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem("founder_transactions");
-    if (saved) {
-      try { setTransactions(JSON.parse(saved)); } catch (e) {}
-    } else {
-      setTransactions([]);
-    }
+    getItems<Transaction>("founder_transactions", []).then(setTransactions);
   }, []);
 
   const save = (updated: Transaction[]) => {
     setTransactions(updated);
-    localStorage.setItem("founder_transactions", JSON.stringify(updated));
+    saveItems("founder_transactions", updated);
   };
 
   const handleCreateInvoice = (e: React.FormEvent) => {

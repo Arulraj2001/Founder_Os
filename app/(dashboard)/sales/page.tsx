@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { getItems, saveItems } from "@/lib/db";
 import { TrendingUp, Plus, UserPlus, FileText, CheckCircle2, Pencil, Trash2, X } from "lucide-react";
 
 interface Lead {
@@ -21,17 +22,12 @@ export default function SalesPage() {
   const [editingLeadId, setEditingLeadId] = useState<string | null>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem("founder_leads");
-    if (saved) {
-      try { setLeads(JSON.parse(saved)); } catch (e) {}
-    } else {
-      setLeads([]);
-    }
+    getItems<Lead>("founder_leads", []).then(setLeads);
   }, []);
 
   const save = (updated: Lead[]) => {
     setLeads(updated);
-    localStorage.setItem("founder_leads", JSON.stringify(updated));
+    saveItems("founder_leads", updated);
   };
 
   const handleAddLead = (e: React.FormEvent) => {

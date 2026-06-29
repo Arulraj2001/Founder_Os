@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import AIAssistant from "@/components/AIAssistant";
 import {
   LayoutDashboard,
   CheckSquare,
@@ -108,8 +109,9 @@ export default function DashboardLayout({
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col overflow-hidden">
+      <main className="flex-1 flex flex-col overflow-hidden relative">
         {children}
+        <AIAssistant />
       </main>
     </div>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { getItems, saveItems } from "@/lib/db";
 import { Receipt, Plus, ArrowDownRight, TrendingDown, Pencil, Trash2, X } from "lucide-react";
 
 interface Expense {
@@ -19,17 +20,12 @@ export default function ExpensesPage() {
   const [editingExpenseId, setEditingExpenseId] = useState<string | null>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem("founder_expenses");
-    if (saved) {
-      try { setExpenses(JSON.parse(saved)); } catch (e) {}
-    } else {
-      setExpenses([]);
-    }
+    getItems<Expense>("founder_expenses", []).then(setExpenses);
   }, []);
 
   const save = (updated: Expense[]) => {
     setExpenses(updated);
-    localStorage.setItem("founder_expenses", JSON.stringify(updated));
+    saveItems("founder_expenses", updated);
   };
 
   const handleAddExpense = (e: React.FormEvent) => {

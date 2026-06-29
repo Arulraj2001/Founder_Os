@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { getItems, saveItems } from "@/lib/db";
 import { Megaphone, Plus, Percent, Users, TrendingUp, BarChart, Pencil, Trash2, X } from "lucide-react";
 import { ResponsiveContainer, BarChart as ReBarChart, Bar, XAxis, YAxis, Tooltip } from "recharts";
 
@@ -25,17 +26,12 @@ export default function MarketingPage() {
   const [editingCampaignId, setEditingCampaignId] = useState<string | null>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem("founder_campaigns");
-    if (saved) {
-      try { setCampaigns(JSON.parse(saved)); } catch (e) {}
-    } else {
-      setCampaigns([]);
-    }
+    getItems<Campaign>("founder_campaigns", []).then(setCampaigns);
   }, []);
 
   const save = (updated: Campaign[]) => {
     setCampaigns(updated);
-    localStorage.setItem("founder_campaigns", JSON.stringify(updated));
+    saveItems("founder_campaigns", updated);
   };
 
   const handleAddCampaign = (e: React.FormEvent) => {

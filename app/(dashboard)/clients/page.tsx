@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { getItems, saveItems } from "@/lib/db";
 import { Users, Plus, Mail, Phone, ShieldCheck, DollarSign, Pencil, Trash2, X } from "lucide-react";
 
 interface Client {
@@ -23,17 +24,12 @@ export default function ClientsPage() {
   const [editingClientId, setEditingClientId] = useState<string | null>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem("founder_clients");
-    if (saved) {
-      try { setClients(JSON.parse(saved)); } catch (e) {}
-    } else {
-      setClients([]);
-    }
+    getItems<Client>("founder_clients", []).then(setClients);
   }, []);
 
   const save = (updated: Client[]) => {
     setClients(updated);
-    localStorage.setItem("founder_clients", JSON.stringify(updated));
+    saveItems("founder_clients", updated);
   };
 
   const handleAddClient = (e: React.FormEvent) => {

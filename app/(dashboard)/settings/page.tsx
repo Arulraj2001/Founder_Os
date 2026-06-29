@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { clearAll } from "@/lib/db";
 import { Settings, Shield, Bell, User, HardDrive, CreditCard } from "lucide-react";
 
 export default function SettingsPage() {
@@ -152,9 +153,10 @@ export default function SettingsPage() {
             <button
               onClick={() => {
                 if (confirm("Are you sure you want to clear all workspace database items? This will reset all tasks, clients, sales leads, campaigns, calendar events, expenses, invoices, and goals.")) {
-                  localStorage.clear();
-                  alert("All workspace data has been cleared! Reloading...");
-                  window.location.reload();
+                  clearAll().then(() => {
+                    alert("All workspace data has been cleared! Reloading...");
+                    window.location.reload();
+                  });
                 }
               }}
               className="w-full bg-red-600/10 hover:bg-red-600 border border-red-500/20 hover:border-red-600 text-red-400 hover:text-white text-[10px] font-bold uppercase tracking-widest py-2.5 rounded-lg transition-all"

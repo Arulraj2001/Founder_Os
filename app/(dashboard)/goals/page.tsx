@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { getItems, saveItems } from "@/lib/db";
 import { Target, Plus, ShieldCheck, HelpCircle, Pencil, Trash2, X } from "lucide-react";
 
 interface Goal {
@@ -21,17 +22,12 @@ export default function GoalsPage() {
   const [editingGoalId, setEditingGoalId] = useState<string | null>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem("founder_goals");
-    if (saved) {
-      try { setGoals(JSON.parse(saved)); } catch (e) {}
-    } else {
-      setGoals([]);
-    }
+    getItems<Goal>("founder_goals", []).then(setGoals);
   }, []);
 
   const save = (updated: Goal[]) => {
     setGoals(updated);
-    localStorage.setItem("founder_goals", JSON.stringify(updated));
+    saveItems("founder_goals", updated);
   };
 
   const handleAddGoal = (e: React.FormEvent) => {

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { getItems, saveItems } from "@/lib/db";
 import { motion, AnimatePresence } from "motion/react";
 import {
   TrendingUp,
@@ -91,79 +92,61 @@ export default function DashboardPage() {
     setIsMounted(true);
     
     // Load tasks
-    const savedTasks = localStorage.getItem("founder_tasks_all");
-    if (savedTasks) {
-      try {
-        setTasks(JSON.parse(savedTasks));
-      } catch (e) {
-        console.error("Failed to load tasks", e);
-      }
-    }
+    getItems<Task>("founder_tasks_all", []).then((loadedTasks) => {
+      setTasks(loadedTasks);
+    });
 
     // Load goals
-    const savedGoals = localStorage.getItem("founder_goals");
-    if (savedGoals) {
-      try {
-        setGoals(JSON.parse(savedGoals));
-      } catch (e) {
-        console.error("Failed to load goals", e);
-      }
-    }
+    getItems<Goal>("founder_goals", []).then((loadedGoals) => {
+      setGoals(loadedGoals);
+    });
 
     // Load leads
-    const savedLeads = localStorage.getItem("founder_leads");
-    if (savedLeads) {
-      try {
-        const parsedLeads = JSON.parse(savedLeads);
-        setLeads(parsedLeads);
-        setActiveLeadsCount(parsedLeads.filter((l: any) => l.stage !== "Won" && l.stage !== "Lost").length);
-      } catch (e) {}
-    }
+    getItems<Lead>("founder_leads", []).then((loadedLeads) => {
+      setLeads(loadedLeads);
+      setActiveLeadsCount(loadedLeads.filter((l: any) => l.stage !== "Won" && l.stage !== "Lost").length);
+    });
 
     // Load transactions for dynamic Revenue and Chart
-    const savedTx = localStorage.getItem("founder_transactions");
-    if (savedTx) {
-      try {
-        const txs = JSON.parse(savedTx);
-        const paidTxs = txs.filter((t: any) => t.status === "Paid");
-        const paidTotal = paidTxs.reduce((acc: number, t: any) => acc + t.amount, 0);
-        setRevenueToday(paidTotal);
+    getItems<any>("founder_transactions", []).then((txs) => {
+      const paidTxs = txs.filter((t: any) => t.status === "Paid");
+      const paidTotal = paidTxs.reduce((acc: number, t: any) => acc + t.amount, 0);
+      setRevenueToday(paidTotal);
 
-        const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-        const daySums = { Mon: 0, Tue: 0, Wed: 0, Thu: 0, Fri: 0, Sat: 0, Sun: 0 };
-        
-        paidTxs.forEach((t: any) => {
-          if (t.date) {
-            const d = new Date(t.date);
-            const dayName = days[d.getDay()] as keyof typeof daySums;
-            if (daySums[dayName] !== undefined) {
-              daySums[dayName] += t.amount;
-            }
+      const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+      const daySums = { Mon: 0, Tue: 0, Wed: 0, Thu: 0, Fri: 0, Sat: 0, Sun: 0 };
+      
+      paidTxs.forEach((t: any) => {
+        if (t.date) {
+          const d = new Date(t.date);
+          const dayName = days[d.getDay()] as keyof typeof daySums;
+          if (daySums[dayName] !== undefined) {
+            daySums[dayName] += t.amount;
           }
-        });
+        }
+      });
 
-        setChartDataState([
-          { name: "Mon", revenue: daySums.Mon },
-          { name: "Tue", revenue: daySums.Tue },
-          { name: "Wed", revenue: daySums.Wed },
-          { name: "Thu", revenue: daySums.Thu },
-          { name: "Fri", revenue: daySums.Fri },
-          { name: "Sat", revenue: daySums.Sat },
-          { name: "Sun", revenue: daySums.Sun },
-        ]);
-      } catch (e) {}
-    }
+      setChartDataState([
+        { name: "Mon", revenue: daySums.Mon },
+        { name: "Tue", revenue: daySums.Tue },
+        { name: "Wed", revenue: daySums.Wed },
+        { name: "Thu", revenue: daySums.Thu },
+        { name: "Fri", revenue: daySums.Fri },
+        { name: "Sat", revenue: daySums.Sat },
+        { name: "Sun", revenue: daySums.Sun },
+      ]);
+    });
   }, []);
 
   // Save changes
   const saveTasks = (newTasks: Task[]) => {
     setTasks(newTasks);
-    localStorage.setItem("founder_tasks_all", JSON.stringify(newTasks));
+    saveItems("founder_tasks_all", newTasks);
   };
 
   const saveGoals = (newGoals: Goal[]) => {
     setGoals(newGoals);
-    localStorage.setItem("founder_goals", JSON.stringify(newGoals));
+    saveItems("founder_goals", newGoals);
   };
 
   const toggleTask = (id: string) => {

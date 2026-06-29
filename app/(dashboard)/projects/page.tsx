@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { getItems, saveItems } from "@/lib/db";
 import { motion, AnimatePresence } from "motion/react";
 import { Briefcase, Plus, TrendingUp, DollarSign, Clock, CheckCircle, Pencil, Trash2, X } from "lucide-react";
 
@@ -22,23 +23,19 @@ export default function ProjectsPage() {
   const [newProjectDueDate, setNewProjectDueDate] = useState("");
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
 
+  const initialProjects: Project[] = [
+    { id: "1", name: "Nebula Platform Redesign", client: "Stellar Systems", budget: 14500, progress: 80, status: "Active", dueDate: "2026-07-15" },
+    { id: "2", name: "SEO & Content Marketing Sprint", client: "GreenGrow SEO", budget: 3500, progress: 42, status: "Active", dueDate: "2026-07-20" },
+    { id: "3", name: "Ad Campaign Optimization", client: "Acme Corp", budget: 5000, progress: 100, status: "Completed", dueDate: "2026-06-25" },
+  ];
+
   useEffect(() => {
-    const saved = localStorage.getItem("founder_projects");
-    if (saved) {
-      try { setProjects(JSON.parse(saved)); } catch (e) {}
-    } else {
-      const initial = [
-        { id: "1", name: "Nebula Platform Redesign", client: "Stellar Systems", budget: 14500, progress: 80, status: "Active", dueDate: "2026-07-15" },
-        { id: "2", name: "SEO & Content Marketing Sprint", client: "GreenGrow SEO", budget: 3500, progress: 42, status: "Active", dueDate: "2026-07-20" },
-        { id: "3", name: "Ad Campaign Optimization", client: "Acme Corp", budget: 5000, progress: 100, status: "Completed", dueDate: "2026-06-25" },
-      ];
-      setProjects(initial as Project[]);
-    }
+    getItems<Project>("founder_projects", initialProjects).then(setProjects);
   }, []);
 
   const save = (updated: Project[]) => {
     setProjects(updated);
-    localStorage.setItem("founder_projects", JSON.stringify(updated));
+    saveItems("founder_projects", updated);
   };
 
   const handleAddProject = (e: React.FormEvent) => {
