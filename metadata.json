@@ -1,0 +1,8 @@
+{
+  "name": "Founder OS",
+  "description": "Geometric Balance Founder Dashboard",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
